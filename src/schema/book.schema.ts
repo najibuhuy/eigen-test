@@ -1,38 +1,24 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, now, SchemaTypes, Types } from 'mongoose';
-import { MemberGenderEnum } from 'src/libs/dto/member.dto';
+import { HydratedDocument, now, Types } from 'mongoose';
 
-export type MemberDocument = HydratedDocument<Member>;
+export type BookDocument = HydratedDocument<Book>;
 
-@Schema({collection: 'Member', versionKey: false})
-export class Member {
+@Schema({collection: 'Book', versionKey: false})
+export class Book {
 
     _id: Types.ObjectId
-
-    @Prop({required: true, type: String})
-    username: string;
-
-    @Prop({required: true, type: String})
-    email: string;
 
     @Prop({required: false, type: String, default: null})
     code: string;
 
     @Prop({required: true, type: String})
-    password: string;
+    title: string;
 
-    @Prop({required: false, type: String, default: null})
-    name: string;
+    @Prop({required: true, type: String})
+    author: string;
 
-    @Prop({required: false, type: String, default: null})
-    image: string;
-
-
-    @Prop({required: false})
-    dob: string;
-
-    @Prop({required: false, enum : [MemberGenderEnum.FEMALE, MemberGenderEnum.MALE, MemberGenderEnum.OTHER], default: MemberGenderEnum.MALE})
-    gender: string;
+    @Prop({required: false, type: Number, default: 0})
+    stock: number;
 
     @Prop({default: now()})
     createdAt: Date;
@@ -41,4 +27,4 @@ export class Member {
     updatedAt: Date;
 }
 
-export const MemberSchema = SchemaFactory.createForClass(Member);
+export const BookSchema = SchemaFactory.createForClass(Book);
