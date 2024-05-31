@@ -1,0 +1,15 @@
+export const ZodiacDto = {
+    SAGITTARIUS : 'SAGITTARIUS',
+    CAPRICORN : 'CAPRICORN',
+    AQUARIUS: 'AQUARIUS',
+    PISCES: 'PISCES',
+    ARIES: 'ARIES',
+    TAURUS: 'TAURUS',
+    GEMINI: 'GEMINI',
+    CANCER: 'CANCER',
+    LEO:'LEO',
+    VIRGO:'VIRGO',
+    LIBRA: 'LIBRA',
+    SCORPIO:'SCORPIO'
+}
+
