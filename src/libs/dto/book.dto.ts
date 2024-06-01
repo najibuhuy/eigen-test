@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsString } from "class-validator";
+import { IsNotEmpty, IsNumber, IsString } from "class-validator";
 
 export interface BookResponseDto {
     author : string;
@@ -12,17 +12,17 @@ export interface BookResponseDto {
 export class CreateBookDto {
     @IsString()
     @IsNotEmpty()
-    @ApiProperty({type: String, description: 'fill your name for create a book, mandatory'})
-    name : string;
+    @ApiProperty({type: String, description: 'fill your title for create a book, mandatory'})
+    title : string;
 
     @IsString()
     @IsNotEmpty()
     @ApiProperty({type: String, description: 'fill your name for author a book, mandatory'})
     author : string;
 
-    @IsString()
+    @IsNumber()
     @IsNotEmpty()
-    @ApiProperty({type: String, description: 'fill your title for create a book, mandatory'})
-    title : string;
+    @ApiProperty({type: Number, description: 'fill your stock for create a book, mandatory'})
+    stock : number;
 
 }

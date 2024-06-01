@@ -1,21 +1,21 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { MemberSchema } from 'src/schema/member.schema';
-import { MemberController } from './member.controller';
-import { MemberService } from './member.service';
+import { BookController } from './book.controller';
+import { BookService } from './book.service';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
+import { BookSchema } from 'src/schema/book.schema';
 
 @Module({
   imports: [
     JwtModule.register({}), 
     ConfigModule,
     MongooseModule.forFeature([
-      { name: 'Member', schema: MemberSchema },
+      { name: 'Book', schema: BookSchema },
       
     ]),
   ],
-  controllers: [MemberController],
-  providers: [MemberService],
+  controllers: [BookController],
+  providers: [BookService],
 })
-export class MemberModule {}
+export class BookModule {}

@@ -6,10 +6,11 @@ import {JwtService} from '@nestjs/jwt';
 import {ConfigService} from '@nestjs/config';
 import { Member } from 'src/schema/member.schema';
 import { LoginMemberDto, RegisterMemberDto } from 'src/libs/dto/auth.dto';
-import { MemberAuthResponseDto } from 'src/libs/dto/member.dto';
+import { MemberAuthResponseDto, createDataMemberDto } from 'src/libs/dto/member.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { ResponseMessageFailedEnum } from 'src/libs/dto/response.dto';
+import { generateMemberCode } from 'src/libs/helper/global.helper';
 
 
 @Injectable({})
@@ -21,83 +22,86 @@ export class AuthMemberService {
     ) {
     }
 
-    async loginMember(dto: LoginMemberDto) : Promise<MemberAuthResponseDto> {
-        try{
+    async registerMember(dataRegister: createDataMemberDto) : Promise<MemberAuthResponseDto> {
+        try {
+          //check email or username is already exist or not
+          const getExistUser = await this.MemberModel.findOne({
+            $or: [
+              {email: dataRegister.email},
+              {username: dataRegister.username}
+            ]
+          })
+          if(getExistUser) {
+            if(getExistUser.email === dataRegister.email) throw {status: HttpStatus.BAD_REQUEST, message: ResponseMessageFailedEnum.NOTUNIQUEEMAIL }
+            else throw {status: HttpStatus.BAD_REQUEST, message: ResponseMessageFailedEnum.NOTUNIQUEUSERNAME }
+          }
+    
+          //hash password
+          const saltOrRound : number = 10
+          const hash = await bcrypt.hash(dataRegister.password, saltOrRound)
+          if(!hash) throw {status: HttpStatus.BAD_REQUEST, message: ResponseMessageFailedEnum.FAILEDPROCESS}
+    
+          //create the member
+          let createMember = new this.MemberModel({
+            username: dataRegister.username,
+            email: dataRegister.email,
+            password: hash,
+            code: generateMemberCode(),
+            dob : dataRegister.dob || null,
+            name : dataRegister.name || null,
+            gender: dataRegister.gender || null
+          });
+          await createMember.save()
+          createMember = createMember.toJSON();
 
+    
+          //return
+          delete createMember._id;
+          delete createMember.password;
+          return {
+            ...createMember,
+          }
+    
+        } catch (e) {
+          Logger.log(e)
+          throw { status : e.status,message : e.message}
+        }
+    
+      }
+    
+      async loginMember(dto: LoginMemberDto) : Promise<MemberAuthResponseDto> {
+        try{
+    
             //get email exist or not
-            let getExistMember = await this.MemberModel.findOne({
+            let getExistUser = await this.MemberModel.findOne({
                 $or : [
                     {email : dto.username},
                     {username: dto.username}
                 ]
             })
-            if(!getExistMember) throw {status: HttpStatus.NOT_FOUND, message: ResponseMessageFailedEnum.NOTFOUNDMEMBER }
+            if(!getExistUser) throw {status: HttpStatus.NOT_FOUND, message: ResponseMessageFailedEnum.NOTFOUNDMEMBER }
             
             //validate password
-            const isMatch = await bcrypt.compare(dto.password, getExistMember.password);
+            const isMatch = await bcrypt.compare(dto.password, getExistUser.password);
             if(!isMatch) throw {status: HttpStatus.UNAUTHORIZED, message: ResponseMessageFailedEnum.WRONGPASSWORD }
             
             //create token
             const token = await this.signToken(
-                String(getExistMember._id)
+                String(getExistUser._id)
             );
-            getExistMember = getExistMember.toJSON();
-            delete getExistMember._id;
-            delete getExistMember.password;
+            getExistUser = getExistUser.toJSON();
+            delete getExistUser._id;
+            delete getExistUser.password;
             return {
-                ...getExistMember,
+                ...getExistUser,
                 token : token
             }
-
+    
         } catch (e){
             Logger.log(e)
             throw { status : e.status,message : e.message}
         }
-    }
-
-    async registerMember(dto: RegisterMemberDto): Promise<MemberAuthResponseDto> {
-        try {
-            //get email exist or not
-            const getExistMember : Member = await this.MemberModel.findOne({
-                $or : [
-                    {email : dto.email},
-                    {username: dto.username}
-                ]
-            })
-            if(getExistMember) {
-                if(getExistMember.email === dto.email) throw {status: HttpStatus.BAD_REQUEST, message: ResponseMessageFailedEnum.NOTUNIQUEEMAIL }
-                else throw {status: HttpStatus.BAD_REQUEST, message: ResponseMessageFailedEnum.NOTUNIQUEUSERNAME }
-            }
-
-            //hashing password
-            const saltOrRound : number = 10
-            const hash = await bcrypt.hash(dto.password, saltOrRound)
-            if(!hash) throw {status: HttpStatus.BAD_REQUEST, message: ResponseMessageFailedEnum.FAILEDPROCESS}
-
-            //create member
-            let createMember  = await this.MemberModel.create({
-                username: dto.username,
-                email: dto.email,
-                password: hash
-            })
-            if(!createMember) throw {status: HttpStatus.BAD_REQUEST, message: ResponseMessageFailedEnum.FAILEDPROCESS}
-
-            //create token
-            const token = await this.signToken(
-                String(createMember._id)
-            );
-            createMember = createMember.toJSON();
-            delete createMember._id;
-            delete createMember.password;
-            return {
-                ...createMember,
-                token : token
-            }
-        } catch (e) {
-            Logger.log(e)
-            throw { status : e.status,message : e.message}
-        }
-    }
+      }
 
     async signToken(
         memberId: string,
@@ -105,7 +109,7 @@ export class AuthMemberService {
         const payload = {
             sub: memberId,
         };
-
+        console.log(payload, "payload")
         const secret = this.config.get('JWT_SECRET');
         const expiresIn = this.config.get(
             'JWT_EXPIRES',

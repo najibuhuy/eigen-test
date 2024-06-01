@@ -2,7 +2,7 @@ import { Body, Controller, Get, HttpStatus, Logger, Param, Post, Put, UseGuards 
 import { ResponseGetListBookByMemberDto, ResponseCreateLoanDto, ResponseMessageSuccessEnum } from 'src/libs/dto/response.dto';
 import { UpdateDataMemberDto } from 'src/libs/dto/member.dto';
 import { Member } from 'src/schema/member.schema';
-import { GetMember } from '../auth/decorator';
+import { GetUser } from '../auth/decorator';
 import { JwtGuard } from '../auth/guard';
 import { LoanService } from './loan.service';
 import { CreateBookDto } from 'src/libs/dto/book.dto';
@@ -13,15 +13,14 @@ export class LoanController {
   constructor(private readonly loanService: LoanService) {}
 
   @Get('/:memberId')
-  @UseGuards(JwtGuard)
-  async getListBookLoan(@Param() memberId : string): Promise<ResponseGetListBookByMemberDto> {
+  async getListBookLoan(@Param() dto : {memberId: string}): Promise<ResponseGetListBookByMemberDto> {
     try{
-      const getListBookLoan = await this.loanService.getListBookLoan(memberId);
+      const getListBookLoan = await this.loanService.getListBookLoan(dto);
       return {
         statusCode: HttpStatus.OK,
         success: true,
         data: getListBookLoan,
-        message: ResponseMessageSuccessEnum.SUCCESSCREATE,
+        message: ResponseMessageSuccessEnum.SUCCESSGET,
       }
     } catch(e) {
       Logger.log(e)
@@ -31,7 +30,7 @@ export class LoanController {
 
   @Post('/create')
   @UseGuards(JwtGuard)
-  async createBookLoan(@GetMember() member : Member, @Body() dataCreate : CreateLoanDto): Promise<ResponseCreateLoanDto> {
+  async createBookLoan(@GetUser() member : Member, @Body() dataCreate : CreateLoanDto): Promise<ResponseCreateLoanDto> {
     try{
       const createBookLoan = await this.loanService.createBookLoan(member, dataCreate);
       return {
@@ -48,7 +47,7 @@ export class LoanController {
 
   @Post('/return')
   @UseGuards(JwtGuard)
-  async returnBookLoan(@GetMember() member : Member, @Body() dataReturn : ReturnLoanDto): Promise<ResponseCreateLoanDto> {
+  async returnBookLoan(@GetUser() member : Member, @Body() dataReturn : ReturnLoanDto): Promise<ResponseCreateLoanDto> {
     try{
       const returnBookLoan = await this.loanService.returnBookLoan(member, dataReturn);
       return {

@@ -1,6 +1,4 @@
-
-
-export const getAge = (birthDate: string) => {
+export const getAge = (birthDate: string) : number => {
     const today = new Date();
         const dob = new Date(birthDate);
         let age = today.getFullYear() - dob.getFullYear();
@@ -11,5 +9,16 @@ export const getAge = (birthDate: string) => {
     return age
 }
 
+export const dateToString = (date: Date) : string => {
+    return date.toDateString()
+}
+
+export const generateMemberCode = () => {
+    return `M${Date.now()}`
+}
+
+export const generateBookCode = () => {
+    return `B${Date.now()}`
+}
 
 

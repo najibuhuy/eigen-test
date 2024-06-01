@@ -17,8 +17,11 @@ export class Loan {
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Book', required: true })
     book: Book;
 
-    @Prop({ type: Boolean, required: false })
+    @Prop({ type: Boolean, required: true })
     isFinished: boolean;
+
+    @Prop({ required: true })
+    limitReturnTime: Date;
 
     @Prop({default: now()})
     createdAt: Date;

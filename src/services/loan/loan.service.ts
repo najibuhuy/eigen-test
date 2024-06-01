@@ -2,54 +2,59 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Member } from 'src/schema/member.schema';
-import { UpdateDataMemberDto, MemberAuthResponseDto } from 'src/libs/dto/member.dto';
-import { getAge } from 'src/libs/helper/global.helper';
+import { dateToString } from 'src/libs/helper/global.helper';
 import { CreateLoanDto, LoanResponseDto, ReturnLoanDto } from 'src/libs/dto/loan.dto';
 import { BookResponseDto } from 'src/libs/dto/book.dto';
 import { Loan } from 'src/schema/loan.schema';
 import { ResponseMessageFailedEnum } from 'src/libs/dto/response.dto';
-import { dateToString, mongooseObjectId } from 'src/libs/helper/mongoose.helper';
+import {  mongooseObjectId } from 'src/libs/helper/mongoose.helper';
 import { Book } from 'src/schema/book.schema';
+import { addDate, isAfterDate, substractDateType } from 'src/libs/helper/dayjs.helper';
 
 @Injectable()
 export class LoanService {
   constructor(
     @InjectModel('Loan') private LoanModel: Model<Loan>,
-    @InjectModel('Book') private BookModel: Model<Book>
-
-
+    @InjectModel('Book') private BookModel: Model<Book>,
+    @InjectModel('Member') private MemberModel: Model<Member>
 
 ) { }
-  async getListBookLoan(memberId: string): Promise<BookResponseDto[]> {
+  async getListBookLoan(dto: {memberId: string}): Promise<BookResponseDto[]> {
     try{
        //query mongodb
        let pipeline = [
         {
           $lookup : {
-            from: 'Member',
-            localField: 'bookBorrower',
-            foreignField: '_id',
-            as: 'member'
+            from: 'Loan',
+            localField: '_id',
+            foreignField: 'book',
+            as: 'loan'
           }
         },
         {
           $lookup : {
-            from: 'Book',
-            localField: 'book',
+            from: 'Member',
+            localField: 'loan.bookBorrower',
             foreignField: '_id',
-            as: 'book'
+            as: 'member'
           }
         },
+        { $unwind: "$member" },
+        { $unwind: "$loan" },
+
         {
           $match : {
-            'member._id' : mongooseObjectId(memberId)
+            'member._id' : mongooseObjectId(dto.memberId)
           }
         },
         {
             '$project': {
-              author : "$book.author",
-              title: "$book.author",
-              stock: "$book.author",
+              bookBorrower: "$member.name",
+              IsSuspended: "$member.isSuspended",
+              limitTime: "$loan.limitReturnTime",
+              author : "$author",
+              title: "$title",
+              stock: "$stock",
               createdAt: "$createdAt",
               updatedAt: "$updatedAt"
             }
@@ -57,7 +62,7 @@ export class LoanService {
       ]
 
       //execute the query
-      const getListLoan : BookResponseDto[] = await this.LoanModel.aggregate(pipeline).exec()
+      const getListLoan : BookResponseDto[] = await this.BookModel.aggregate(pipeline).exec()
       return getListLoan
       
 
@@ -87,7 +92,9 @@ export class LoanService {
       //create the loan data
       const LoanMod = new this.LoanModel({
         bookBorrower :memberProfile,
-        book: getBook
+        book: getBook,
+        isFinished : false,
+        limitReturnTime: addDate(dateToString(new Date()), 7, substractDateType.DAY )
       });
       await LoanMod.save()
       
@@ -102,8 +109,9 @@ export class LoanService {
           stock: updateBookStock.stock,
           createdAt: dateToString(updateBookStock.createdAt),
           updatedAt: dateToString(updateBookStock.updatedAt)
-
+          
         },
+        limitReturnTime: dateToString(LoanMod.limitReturnTime)
       }
     }catch (e) {
       Logger.log(e)
@@ -123,24 +131,37 @@ export class LoanService {
       if(!getBook) throw({status: 400, message: ResponseMessageFailedEnum.BOOKNOTFOUND})
         
       //Check the loan date, If the book is returned after more than 7 days, the member will be subject to a penalty
-      
+      const checkLImitReturnTime = isAfterDate(dateToString(getLoan.limitReturnTime), dateToString(new Date))
+      if(checkLImitReturnTime) {
+        await this.MemberModel.findByIdAndUpdate(
+          {_id: memberProfile._id}, 
+          {
+            isSuspended: true, 
+            suspendTime: addDate(dateToString(new Date()), 3, substractDateType.DAY )
+          }
+        )
+      }
 
       //update loan isFinished : true
-      await this.BookModel.findByIdAndUpdate({isFinished: true},{stock: getBook.stock - 1})
-      //update the book's stock
-      const updateBookStock = await this.BookModel.findByIdAndUpdate({_id: dataReturn.bookId},{stock: getBook.stock + 1})
+      const updateLoanFinished = await this.LoanModel.findByIdAndUpdate({_id: getLoan._id},{isFinished: true})
 
-      return {
+      if(updateLoanFinished) {
+        
+        //update the book's stock
+        const updateBookStock = await this.BookModel.findByIdAndUpdate({_id: dataReturn.bookId},{stock: getBook.stock + 1})
+        
+        return {
         member: memberProfile,
         book : {
           author : updateBookStock.author,
           title: updateBookStock.title,
           stock: updateBookStock.stock,
           createdAt: dateToString(updateBookStock.createdAt),
-          updatedAt: dateToString(updateBookStock.updatedAt)
-
-        },
-      }
+          updatedAt: dateToString(updateBookStock.updatedAt),
+          },
+          limitReturnTime: dateToString(getLoan.limitReturnTime)
+        }
+      } else throw({status:400, message: "Failed to Edit Loan"})
     }catch (e) {
       Logger.log(e)
       throw { status : e.status,message : e.message}

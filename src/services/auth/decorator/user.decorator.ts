@@ -3,7 +3,7 @@ import {
   ExecutionContext,
 } from '@nestjs/common';
 
-export const GetMember = createParamDecorator(
+export const GetUser = createParamDecorator(
   (
     data: string | undefined,
     ctx: ExecutionContext,
@@ -12,8 +12,8 @@ export const GetMember = createParamDecorator(
       .switchToHttp()
       .getRequest();
     if (data) {
-      return request.member[data];
+      return request.user[data];
     }
-    return request.member;
+    return request.user;
   },
 );

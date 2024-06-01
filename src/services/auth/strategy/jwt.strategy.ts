@@ -29,7 +29,6 @@ export class JwtStrategy extends PassportStrategy(
   async validate(payload: {
     sub: string;
   }) {
-    
     //check payload
     const getMember = await this.MemberModel.findOne({
       _id : mongooseObjectId(payload.sub)

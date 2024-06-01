@@ -2,11 +2,20 @@ import { MessageResponseDto } from "./message.dto";
 import { MemberAuthResponseDto } from "./member.dto";
 import { LoanResponseDto } from "./loan.dto";
 import { BookResponseDto } from "./book.dto";
+import { Member } from "src/schema/member.schema";
+import { Book } from "src/schema/book.schema";
 
 export interface ResponseAuthMemberDto {
     statusCode : Number;
     success: Boolean;
     data? : MemberAuthResponseDto;
+    message : String;
+}
+
+export interface ResponseMemberListDto {
+    statusCode : Number;
+    success: Boolean;
+    data? : Member[];
     message : String;
 }
 
@@ -21,6 +30,13 @@ export interface ResponseGetListBookByMemberDto {
     statusCode : Number;
     success: Boolean;
     data : BookResponseDto[];
+    message : String;
+}
+
+export interface ResponseGetBookDto {
+    statusCode : Number;
+    success: Boolean;
+    data : Book;
     message : String;
 }
 
@@ -44,6 +60,7 @@ export enum ResponseMessageFailedEnum {
     INTERNALSERVERERROR = 'INTERNAL SERVER ERROR',
     NOTUNIQUEEMAIL = 'EMAIL EXIST',
     NOTUNIQUEUSERNAME = 'USERNAME EXIST',
+    NOTUNIQUEBOOKTITLE = 'BOOK TITLE EXIST',
     FAILEDPROCESS = 'FAILED TO PROCESS',
     NOTFOUND = 'NOT FOUND',
     NOTFOUNDMEMBER = 'NOT FOUND MEMBER',

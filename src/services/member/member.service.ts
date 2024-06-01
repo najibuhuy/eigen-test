@@ -1,14 +1,21 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Member } from 'src/schema/member.schema';
-import { UpdateDataMemberDto, MemberAuthResponseDto } from 'src/libs/dto/member.dto';
-import { getAge } from 'src/libs/helper/global.helper';
-
+import { UpdateDataMemberDto, MemberAuthResponseDto, createDataMemberDto } from 'src/libs/dto/member.dto';
+import { generateMemberCode, getAge } from 'src/libs/helper/global.helper';
+import { ResponseMessageFailedEnum } from 'src/libs/dto/response.dto';
+import { LoginMemberDto } from 'src/libs/dto/auth.dto';
+import * as bcrypt from 'bcrypt';
+import {JwtService} from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class MemberService {
   constructor(
-    @InjectModel('Member') private MemberModel: Model<Member>
+    @InjectModel('Member') private MemberModel: Model<Member>,
+    private config: ConfigService,
+    private jwt: JwtService,
+
 
 ) { }
   async getProfile(memberProfile: Member): Promise<MemberAuthResponseDto> {
@@ -64,5 +71,17 @@ export class MemberService {
     }
 
   }
+
+  async getListMember(): Promise<Member[]> {
+    try{
+      return await this.MemberModel.find({});
+      
+    }catch (e) {
+      Logger.log(e)
+      throw { status : e.status,message : e.message}
+    }
+
+  }
+
 
 }

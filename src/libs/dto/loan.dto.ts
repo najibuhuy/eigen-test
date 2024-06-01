@@ -6,6 +6,7 @@ import { BookResponseDto } from "./book.dto";
 export interface LoanResponseDto {
     member : MemberAuthResponseDto;
     book : BookResponseDto;
+    limitReturnTime: string;
     createdAt?: string;
     updatedAt?: string;
 }

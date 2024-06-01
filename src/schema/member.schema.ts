@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, now, SchemaTypes, Types } from 'mongoose';
-import { MemberGenderEnum } from 'src/libs/dto/member.dto';
+import { MemberGenderEnum } from 'src/libs/dto/global.dto';
 
 export type MemberDocument = HydratedDocument<Member>;
 
@@ -15,7 +15,7 @@ export class Member {
     @Prop({required: true, type: String})
     email: string;
 
-    @Prop({required: false, type: String, default: null})
+    @Prop({required: true, type: String, })
     code: string;
 
     @Prop({required: true, type: String})

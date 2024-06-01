@@ -7,6 +7,9 @@ import {LoggerMiddleware} from "./utils";
 import { MemberModule} from './services/member/member.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AuthMemberModule } from './services/auth/authMember.module';
+import { LoanModule } from './services/loan/loan.module';
+import { BookModule } from './services/book/book.module';
+import { CronModule } from './services/cron/cron.module';
 
 
 @Module({
@@ -26,6 +29,9 @@ import { AuthMemberModule } from './services/auth/authMember.module';
           }),
         MemberModule,
         AuthMemberModule,
+        LoanModule,
+        BookModule,
+        CronModule
 
     ],
     controllers: [],
