@@ -1,0 +1,24 @@
+service: nestjs-library-service
+
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  architecture: arm64
+  stage: ${opt:stage, 'dev'}
+  region: ${opt:region, 'ap-southeast-1'}
+  memorySize: 128
+  logRetentionInDays: 1
+  timeout: 15
+
+functions:
+  api:
+    handler: dist/lambda.handler
+    events:
+      - httpApi:
+          method: any
+          path: /{proxy+}
+
+plugins:
+  - serverless-jetpack
+  - serverless-offline

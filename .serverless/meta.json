@@ -1,0 +1,179 @@
+{
+  "/home/njb/Documents/eigen-test": {
+    "versionSfCore": null,
+    "versionFramework": "4.1.23",
+    "isWithinCompose": false,
+    "isCompose": false,
+    "composeOrgName": null,
+    "composeResolverProviders": {
+      "opt": {
+        "instance": {
+          "credentials": "<REDACTED>",
+          "serviceConfigFile": {
+            "service": "nestjs-serverless-pg",
+            "provider": {
+              "name": "aws",
+              "runtime": "nodejs18.x",
+              "architecture": "arm64",
+              "stage": "dev",
+              "region": "ap-southeast-1",
+              "memorySize": 128,
+              "logRetentionInDays": 1,
+              "timeout": 15,
+              "versionFunctions": true
+            },
+            "functions": {
+              "api": {
+                "handler": "dist/lambda.handler",
+                "events": [
+                  {
+                    "httpApi": {
+                      "method": "any",
+                      "path": "/{proxy+}"
+                    }
+                  }
+                ]
+              }
+            },
+            "plugins": [
+              "serverless-jetpack",
+              "serverless-offline"
+            ]
+          },
+          "configFileDirPath": "/home/njb/Documents/eigen-test",
+          "config": {
+            "type": "opt"
+          },
+          "options": {
+            "reloadhandler": true
+          },
+          "_credentialsPromise": "<REDACTED>"
+        },
+        "resolvers": {}
+      },
+      "aws": {
+        "instance": {
+          "credentials": "<REDACTED>",
+          "serviceConfigFile": {
+            "service": "nestjs-serverless-pg",
+            "provider": {
+              "name": "aws",
+              "runtime": "nodejs18.x",
+              "architecture": "arm64",
+              "stage": "dev",
+              "region": "ap-southeast-1",
+              "memorySize": 128,
+              "logRetentionInDays": 1,
+              "timeout": 15,
+              "versionFunctions": true
+            },
+            "functions": {
+              "api": {
+                "handler": "dist/lambda.handler",
+                "events": [
+                  {
+                    "httpApi": {
+                      "method": "any",
+                      "path": "/{proxy+}"
+                    }
+                  }
+                ]
+              }
+            },
+            "plugins": [
+              "serverless-jetpack",
+              "serverless-offline"
+            ]
+          },
+          "configFileDirPath": "/home/njb/Documents/eigen-test",
+          "config": {
+            "type": "aws"
+          },
+          "options": {
+            "reloadhandler": true
+          },
+          "stage": "dev",
+          "dashboard": null,
+          "_credentialsPromise": "<REDACTED>",
+          "isDefaultConfig": true
+        },
+        "resolvers": {}
+      }
+    },
+    "composeServiceName": null,
+    "servicePath": "/home/njb/Documents/eigen-test",
+    "serviceConfigFileName": "serverless.yml",
+    "service": {
+      "service": "nestjs-serverless-pg",
+      "provider": {
+        "name": "aws",
+        "runtime": "nodejs18.x",
+        "architecture": "arm64",
+        "stage": "dev",
+        "region": "ap-southeast-1",
+        "memorySize": 128,
+        "logRetentionInDays": 1,
+        "timeout": 15,
+        "versionFunctions": true
+      },
+      "functions": {
+        "api": {
+          "handler": "dist/lambda.handler",
+          "events": [
+            {
+              "httpApi": {
+                "method": "any",
+                "path": "/{proxy+}"
+              }
+            }
+          ]
+        }
+      },
+      "plugins": [
+        "serverless-jetpack",
+        "serverless-offline"
+      ]
+    },
+    "serviceRawFile": "service: nestjs-serverless-pg\n\n\nprovider:\n  name: aws\n  runtime: nodejs18.x\n  architecture: arm64\n  stage: ${opt:stage, 'dev'}\n  region: ${opt:region, 'ap-southeast-1'}\n  memorySize: 128\n  logRetentionInDays: 1\n  timeout: 15\n\nfunctions:\n  api:\n    handler: dist/lambda.handler\n    events:\n      - httpApi:\n          method: any\n          path: /{proxy+}\n\nplugins:\n  - serverless-jetpack\n  - serverless-offline",
+    "command": [
+      "offline",
+      "start"
+    ],
+    "options": {
+      "reloadhandler": true
+    },
+    "error": {
+      "message": "Unrecognized option \"reloadhandler\". Run \"serverless offline start --help\" for a list of all available options.",
+      "stack": "ServerlessError2: Unrecognized option \"reloadhandler\". Run \"serverless offline start --help\" for a list of all available options.\n    at ensure_supported_command_default (file:///home/njb/.serverless/releases/4.1.23/package/dist/sf-core.js:891:2605)\n    at runFramework (file:///home/njb/.serverless/releases/4.1.23/package/dist/sf-core.js:935:2054)\n    at async route (file:///home/njb/.serverless/releases/4.1.23/package/dist/sf-core.js:946:16458)\n    at async Object.run2 [as run] (file:///home/njb/.serverless/releases/4.1.23/package/dist/sf-core.js:946:16856)\n    at async run3 (file:///home/njb/.serverless/releases/4.1.23/package/dist/sf-core.js:946:18116)",
+      "code": "UNSUPPORTED_CLI_OPTIONS"
+    },
+    "params": {},
+    "machineId": "1ebb6071977534416a05fdd2a04bdbfa",
+    "accessKeyV2": "<REDACTED>",
+    "accessKeyV1": "<REDACTED>",
+    "orgId": "65e5f80f-0679-4f08-bf0c-71fdf6aced0e",
+    "orgName": "najibgod",
+    "userId": "dXwXBrPDJ49381sqxh",
+    "dashboard": {
+      "isEnabledForService": false,
+      "requiredAuthentication": false,
+      "orgFeaturesInUse": null,
+      "orgObservabilityIntegrations": null,
+      "serviceAppId": null,
+      "serviceProvider": null,
+      "instanceParameters": null
+    },
+    "userName": "najibgod",
+    "subscription": null,
+    "userEmail": "najibalyasyfi@gmail.com",
+    "serviceProviderAwsCredentials": "<REDACTED>",
+    "serviceProviderAwsAccountId": "643298862914",
+    "versionSf": "4.1.23",
+    "serviceProviderAwsCfStackName": "nestjs-serverless-pg-dev",
+    "serviceProviderAwsCfStackId": null,
+    "serviceProviderAwsCfStackCreated": null,
+    "serviceProviderAwsCfStackUpdated": null,
+    "serviceProviderAwsCfStackStatus": null,
+    "serviceProviderAwsCfStackOutputs": null
+  }
+}
